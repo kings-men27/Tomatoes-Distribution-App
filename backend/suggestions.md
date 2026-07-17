@@ -1,2 +1,2 @@
 Stanley Eke (Group Member)
-Suggested dependency list (approved)
+1. Suggested dependency list (approved)
