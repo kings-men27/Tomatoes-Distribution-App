@@ -14,7 +14,7 @@ const entityClasses = Object.values(Entities).filter(
 export const AppDataSource = new DataSource({
   type: 'postgres',
   url: process.env.DATABASE_URL,
-  synchronize: false, 
+  synchronize: true, 
   logging: process.env.NODE_ENV === 'development',
   
   // Convert the Entities object into an array of classes for TypeORM
