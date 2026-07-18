@@ -1,8 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToOne, OneToMany, JoinColumn } from "typeorm";
 import { User } from "../entity";
 import { Product } from "../entity";
-import { Logistic } from "../entity";
-import { Payment } from "../entity";
+//import { Logistic } from "../entity";
+//import { Payment } from "../entity";
 
 @Entity()
 export class Order {
@@ -27,10 +27,12 @@ export class Order {
     @ManyToOne(() => User, (user) => user.orders)
     buyer!: User;
 
-    @OneToOne(() => Logistic, (logistic) => logistic.order)
-    logistic!: Logistic;
+    @OneToOne(() => Logistics, (logistics) => logistics.order)
+    @JoinColumn({ name: "logisticId" })
+    logistics!: Logistic;
 
     // One order can have many payment attempt retrys
     @OneToMany(() => Payment, (payment) => payment.order)
+    @JoinColumn({ name: "paymentId" })
     payments!: Payment[];
 }
