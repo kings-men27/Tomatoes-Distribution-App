@@ -1,11 +1,12 @@
-import { BrowserRouter } from "react-router-dom";
-import AppRoutes from "./routes/AppRoutes";
+import React from 'react';
+import Settings from './pages/Settings';
+import './App.css';
 
 function App() {
   return (
-    <BrowserRouter>
-      <AppRoutes />
-    </BrowserRouter>
+    <div className="App">
+      <Settings />
+    </div>
   );
 }
 
