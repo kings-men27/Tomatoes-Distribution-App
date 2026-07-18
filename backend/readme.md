@@ -11,7 +11,7 @@ This document defines the specific task ownership for the 3-person Farm2Market d
 
 ## Task Delegation Breakdown
 
-| Entity/Module | Team Lead (You) | peer 1| peer 2|
+| Entity/Module | Team Lead (You) | peer 2| peer 1|
 | :--- | :--- | :--- | :--- |
 | **Auth & RBAC** | Middleware Logic | Implementation of Sign-up/Login logic | Unit tests for login/role flows |
 | **Admin Controls** | Review & System Architecture | Admin endpoint implementation | Basic CRUD for User listing |
