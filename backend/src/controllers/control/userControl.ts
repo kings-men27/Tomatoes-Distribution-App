@@ -14,24 +14,21 @@ import { AppDataSource } from '../../db/datasource';
  */
 
 export const signUp = async (req: Request, res: Response) => {
-  const { userName, phoneNumber, email, password, securityQuestion, securityAnswer } = req.body||{};
+  const { userName, phoneNumber, password, securityQuestion, securityAnswer } = req.body||{};
   try {
     // Ensure recovery fields are provided
-    if (!userName || !phoneNumber || !password ) {
+    if ( !phoneNumber || !password ) {
       return res.status(400).json({ message: "All fields, including security question and answer, are required" });
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(String(email).toLowerCase())) {
-      return res.status(400).json({ message: "Invalid email address" });
-    }
+    
 
     if (String(password).length < 6) {
       return res.status(400).json({ message: "Password must be at least 6 characters" });
     }
 
     const userRepo = AppDataSource.getRepository(entity.User);
-    const existingUser = await userRepo.findOne({ where: { email: email.toLowerCase() } });
+    const existingUser = await userRepo.findOne({ where: { phoneNumber: phoneNumber} });
 
     if (existingUser) {
       return res.status(409).json({ message: "User already exists" });
@@ -46,13 +43,13 @@ export const signUp = async (req: Request, res: Response) => {
       userName: userName,
       phoneNumber: phoneNumber,
       password: hashedPassword,
-      securityQuestion,
+      securityQuestion: securityQuestion,
       securityAnswer: hashedAnswer,
     });
     const savedUser = await userRepo.save(created);
     
-    const user = { userId: savedUser.userId, fullName: savedUser.userName, phoneNumber: savedUser.phoneNumber, role: savedUser.role };
-    const info = { userId: String(user.userId), phoneNumber: String(user.phoneNumber), role: String(user.role) };
+    const user = { userId: savedUser.userId, fullName: savedUser.userName, phoneNumber: savedUser.phoneNumber};
+    const info = { userId: String(user.userId), phoneNumber: String(user.phoneNumber) };
 
     if (!process.env.JWT_SECRET) {
       return res.status(500).json({ success: false, message: 'Server misconfiguration: auth secret missing' });
@@ -61,7 +58,7 @@ export const signUp = async (req: Request, res: Response) => {
     const token = jwt.sign(info, process.env.JWT_SECRET, {
       expiresIn: (process.env.JWT_EXPIRES_IN || "1d") as any,
     });
-
+    
     return res.status(201).json({
       success: true,
       message: "User created successfully",
@@ -71,10 +68,15 @@ export const signUp = async (req: Request, res: Response) => {
 
   } catch (error: any) {
    // logger.error({ err: error }, "Sign-up process failed unexpectedly");
-    if (error?.code === '23505') {
+   /* if (error?.code === '23505') {
       return res.status(409).json({ success: false, message: 'User already exists' });
     }
     return res.status(500).json({ success: false, message: "Unexpected error: sign up failed." });
+  }*/
+  console.error("DEBUG ERROR:", error); // Logs to your terminal
+  if (error?.code === '23505') {
+    return res.status(409).json({ success: false, message: 'User already exists' });
+  }
   }
 }; // end of signUp
 
@@ -128,7 +130,7 @@ export const signIn = async (req: Request, res: Response) => {
       info, 
       process.env.JWT_SECRET as string, 
       { 
-        expiresIn: (process.env.JWT_EXPIRES_IN || "1d") as any // 'any' bypasses strict type checking for the option
+        expiresIn: (process.env.JWT_EXPIRES_IN || "1d") as any // 'any' bypasses strict type checking for the option jwt.sign
       }
     );
 

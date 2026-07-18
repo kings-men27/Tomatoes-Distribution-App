@@ -34,7 +34,7 @@ export class User {
   userName!: string;
 
   @Index({ unique: true })
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', unique: true })
   phoneNumber!: string;
   
 
