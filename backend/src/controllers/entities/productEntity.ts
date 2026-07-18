@@ -7,7 +7,7 @@ import {
   Index,
   OneToMany
 } from 'typeorm';
-import { Review } from './reviewEntity';
+import { Review } from '../entity';
 
 @Entity('products')
 export class Product {
