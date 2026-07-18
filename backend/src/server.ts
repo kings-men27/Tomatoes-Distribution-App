@@ -1,5 +1,6 @@
 import 'reflect-metadata'; 
 import express, { Application, Request, Response } from 'express';
+import { ensureDatabaseExists } from './db/DbExists';
 import helmet from 'helmet';
 import cors from 'cors';
 import morgan from 'morgan';
@@ -23,17 +24,27 @@ app.use(express.urlencoded({ extended: true }));
 const PORT = process.env.PORT || 3000;
 
 
-const connectWithRetry = async () => {
-  try {
-    await AppDataSource.initialize();
-    console.log('Data Source has been initialized!');
-  } catch (err) {
-    console.error(' Error during Data Source initialization, retrying in 5s...', err);
-    setTimeout(connectWithRetry, 5000);
-  }
-};
 
-connectWithRetry();
+
+
+async function startServer() {
+  try {
+    // 1. Ensure the DB is created first
+    await ensureDatabaseExists();
+
+    // 2. Now initialize your AppDataSource (which connects to 'tomatoes')
+    await AppDataSource.initialize();
+    console.log("AppDataSource initialized successfully.");
+    
+    // ... start your express server here
+  } catch (error) {
+    console.error("Error during startup:", error);
+  }
+}
+
+startServer();
+
+
 
 // --- Security & Utility Middlewares ---
 app.use(helmet());
@@ -66,11 +77,12 @@ app.get('/health', (req: Request, res: Response) => {
 // --- Server & Database Initialization ---
 AppDataSource.initialize()
   .then(() => {
+    
     console.log(' Database connection established.');
    // startBookingStatusScheduler();
     
-    app.listen(3000, '0.0.0.0', () => {
-    console.log('Server running on http://0.0.0.0:3000');
+    app.listen(3000, () => {
+    console.log('Server running on http://localhost:3000');
 });
   })
   .catch((error) => {

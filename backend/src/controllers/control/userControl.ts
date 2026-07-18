@@ -17,7 +17,7 @@ export const signUp = async (req: Request, res: Response) => {
   const { userName, phoneNumber, email, password, securityQuestion, securityAnswer } = req.body||{};
   try {
     // Ensure recovery fields are provided
-    if (!userName || !email || !password || !securityQuestion || !securityAnswer) {
+    if (!userName || !phoneNumber || !password ) {
       return res.status(400).json({ message: "All fields, including security question and answer, are required" });
     }
 
@@ -43,16 +43,16 @@ export const signUp = async (req: Request, res: Response) => {
     const hashedAnswer = await bcrypt.hash(securityAnswer.toLowerCase().trim(), salt);
 
     const created = userRepo.create({
-      fullName,
-      email: email.toLowerCase(),
+      userName: userName,
+      phoneNumber: phoneNumber,
       password: hashedPassword,
       securityQuestion,
-      securityAnswerHash: hashedAnswer,
+      securityAnswer: hashedAnswer,
     });
     const savedUser = await userRepo.save(created);
     
-    const user = { id: savedUser.id, fullName: savedUser.fullName, email: savedUser.email };
-    const info = { id: String(user.id), email: String(user.email) };
+    const user = { userId: savedUser.userId, fullName: savedUser.userName, phoneNumber: savedUser.phoneNumber, role: savedUser.role };
+    const info = { userId: String(user.userId), phoneNumber: String(user.phoneNumber), role: String(user.role) };
 
     if (!process.env.JWT_SECRET) {
       return res.status(500).json({ success: false, message: 'Server misconfiguration: auth secret missing' });
@@ -70,7 +70,7 @@ export const signUp = async (req: Request, res: Response) => {
     });
 
   } catch (error: any) {
-    logger.error({ err: error }, "Sign-up process failed unexpectedly");
+   // logger.error({ err: error }, "Sign-up process failed unexpectedly");
     if (error?.code === '23505') {
       return res.status(409).json({ success: false, message: 'User already exists' });
     }
