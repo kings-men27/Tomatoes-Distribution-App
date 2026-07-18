@@ -142,7 +142,7 @@ export const signIn = async (req: Request, res: Response) => {
       }, 
     });
   } catch (error) {
-    logger.error({ err: error }, "#panic sign in process failed");
+    //logger.error({ err: error }, "#panic sign in process failed");
 
     return res.status(500).json({
       success: false,
@@ -182,7 +182,7 @@ export const getRecoveryQuestion = async (req: Request, res: Response) => {
       securityQuestion: user.securityQuestion,
     });
   } catch (error) {
-    logger.error({ err: error }, "Failed to retrieve recovery question");
+    //logger.error({ err: error }, "Failed to retrieve recovery question");
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -210,9 +210,9 @@ export const resetPassword = async (req: Request, res: Response) => {
     const user = await userRepo.findOne({ 
       where: { email: email.toLowerCase() },
       select: {
-        id: true,
+        userId: true,
         password: true,
-        securityAnswerHash: true
+        securityAnswer: true
       }
     });
 
@@ -246,7 +246,7 @@ export const resetPassword = async (req: Request, res: Response) => {
 
     return res.status(200).json({ success: true, message: "Password reset successful" });
   } catch (error) {
-    logger.error({ err: error }, "Password reset failed");
+    //logger.error({ err: error }, "Password reset failed");
     return res.status(500).json({ message: "Internal server error" });
   }
 };

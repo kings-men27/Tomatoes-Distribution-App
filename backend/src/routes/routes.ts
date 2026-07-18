@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import adminRouter from './adminRouter';
+//import adminRouter from './adminRouter';
 
 // Auth Middleware
 import { isAuthenticated,
@@ -15,8 +15,7 @@ import {
 
 const apiRouter = Router();
 
-// Route Discovery
-apiRouter.get('/routes', routes);
+
 
 
 // AUTHENTICATION & RECOVERY
@@ -34,6 +33,6 @@ apiRouter.post('/auth/reset-password', authCtrl.resetPassword);
 
 // ADMIN LOGIC
 
-apiRouter.use('/admin', adminRouter);
+
 
 export default apiRouter;

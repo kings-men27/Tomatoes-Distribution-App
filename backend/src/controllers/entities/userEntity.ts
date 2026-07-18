@@ -7,6 +7,7 @@ import {
   OneToOne,
   Index
 } from 'typeorm';
+import "reflect-metaData"
 import { Product } from '../entity';
 import { Wallet } from '../entity';
 //import { Order } from '../entity';
@@ -23,40 +24,40 @@ export class User {
   @PrimaryGeneratedColumn("uuid")
   userId!: string;
 
-  @Column()
-  role!: "Farmer" | "Buyer | Admin";
+  @Column({type: 'enum', enum: UserRole, default: UserRole.BUYER })
+  role!: UserRole;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: true })
   businessName?: string;
 
-  @Column()
+  @Column({type: 'varchar'})
   userName!: string;
 
   @Index({ unique: true })
-  @Column()
+  @Column({ type: 'varchar', nullable: true })
   phoneNumber!: string;
   
-  @Index()
-  @Column()
+
+  @Column({ type: 'varchar', nullable: true })
   securityQuestion?: string;
 
-  @Index()
-  @Column()
+ 
+  @Column({ type: 'varchar', nullable: true })
   securityAnswer?: string;
 
-  @Column()
-  password!: string;
+  @Column({ type: 'varchar', nullable: true })
+  password?: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: true })
   location?: string[];
   
-  @Column({ nullable: true })
+  @Column({ type: 'varchar',nullable: true })
   address?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   email?: string;
   
-  @Column({ nullable: true })
+  @Column({type: 'varchar', nullable: true })
   profilePic?: string;
   
   @OneToOne(() => Wallet, (wallet) => wallet.user)
@@ -64,13 +65,13 @@ export class User {
 
 
   // Farmer- only payout fields - nullable for Buyer
-  @Column({ nullable: true })
+  @Column({ type: 'varchar',nullable: true })
   accountNumber?: string;
   
-  @Column({ nullable: true })
+  @Column({ type: 'varchar',nullable: true })
   accountName?: string;
   
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   bankName?: string;
   
   
@@ -80,8 +81,8 @@ export class User {
   products?: Product[];
   
   //One buyer places many products
-  @OneToMany(() => Order, (order) => order)
-  orders?: Order[];
+  //@OneToMany(() => Order, (order) => order)
+  //orders?: Order[];
   
   //One user writes many reviews
   @OneToMany(() => Review, (review) => review)

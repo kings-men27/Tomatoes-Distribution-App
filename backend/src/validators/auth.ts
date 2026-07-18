@@ -61,8 +61,8 @@ import bcrypt from "bcrypt";
      if (!req.user || !roles.includes(req.user.role)) {
       try {
         
-        const logRepo = AppDataSource.getRepository(entity.LogActivity);
-        await logRepo.save({
+       // const logRepo = AppDataSource.getRepository(entity.LogActivity);
+        /*await logRepo.save({
           action: "FORBIDDEN_ACCESS",
           userId: req.user?.userId || null,
           ipAddress: req.ip || "",
@@ -72,7 +72,7 @@ import bcrypt from "bcrypt";
             role: req.user?.role,
             allowedRoles: roles
           }
-        });
+        });*/
       } catch (logError) {
         // Fail safe to avoid blocking the response flow if logging fails
         console.error("Failed to write access log:", logError);
@@ -114,7 +114,7 @@ export const verifySecurityAnswer = async (req: Request, res: Response) => {
       // Optional: Generate a short-lived token here to pass to the next step
     });
   } catch (error) {
-    logger.error({ err: error }, "Security answer verification failed");
+   // logger.error({ err: error }, "Security answer verification failed");
     return res.status(500).json({ message: "Internal server error" });
   }
 };
