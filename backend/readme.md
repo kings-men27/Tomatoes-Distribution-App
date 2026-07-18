@@ -4,8 +4,8 @@ This document defines the specific task ownership for the 3-person Farm2Market d
 
 ## Team Roles
 1.  **Team Lead (You):** Focuses on system architecture, FastAPI/ML integration, database integration, and routing. Serves as final gatekeeper for all PRs.
-2.  **Reliable Partner:** Focuses on business logic, Zod validation implementation, and quality assurance for the Unreliable Partner’s work.
-3.  **Unreliable Partner:** Focuses on high-volume, low-risk CRUD implementation, data seeding, and initial scaffolding.
+2.  *:** Focuses on business logic, Zod validation implementation, and quality assurance for the Unreliable Partner’s work.
+3.  **** Focuses on high-volume, low-risk CRUD implementation, data seeding, and initial scaffolding.
 
 ---
 
