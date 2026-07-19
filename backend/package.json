@@ -23,6 +23,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@types/pg": "^8.20.0",
     "axios": "^1.18.1",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
