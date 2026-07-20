@@ -67,7 +67,7 @@ if (fs.existsSync(swaggerPath)) {
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 }
 
-app.use('/', apiRouter);
+app.use('/api', apiRouter);
 
 app.get('/health', (req: Request, res: Response) => {
   res.status(200).json({ status: 'success', message: 'farm API is live.' });

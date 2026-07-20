@@ -5,7 +5,6 @@
   background-color: #f4f8f4;
 }
 
-/* Hero section — colored block up top, no more dead empty space */
 .welcome-hero {
   background-color: #1b4332;
   padding: 48px 24px 40px;
@@ -26,6 +25,12 @@
   margin-bottom: 16px;
 }
 
+.welcome-logo-img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
 .welcome-logo-text {
   font-size: 20px;
   font-weight: 800;
@@ -38,7 +43,6 @@
   font-weight: 500;
 }
 
-/* Body section — fills remaining space with purpose */
 .welcome-body {
   flex: 1;
   display: flex;
@@ -57,12 +61,27 @@
 }
 
 .welcome-features li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   font-size: 14px;
   color: #1a1a1a;
   background-color: #ffffff;
   padding: 14px 16px;
   border-radius: 10px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.welcome-feature-icon {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  color: #1b4332;
+}
+
+.welcome-feature-icon svg {
+  width: 100%;
+  height: 100%;
 }
 
 .welcome-role-section {

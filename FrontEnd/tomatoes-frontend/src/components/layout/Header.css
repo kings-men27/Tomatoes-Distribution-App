@@ -1,0 +1,55 @@
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e2e2e2;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-logo-img {
+  width: 30px;
+  height: 50px;
+  object-fit: contain;
+}
+
+.hamburger-btn {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+}
+
+.hamburger-btn span {
+  width: 22px;
+  height: 2px;
+  background-color: #1a1a1a;
+  border-radius: 2px;
+}
+
+.profile-btn {
+  text-decoration: none;
+}
+
+.profile-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #dbe8dc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: #1a1a1a;
+  font-weight: 700;
+}

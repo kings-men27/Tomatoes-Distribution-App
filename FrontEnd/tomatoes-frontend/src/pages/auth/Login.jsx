@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Input from "../../components/ui/Input";
 import Button from "../../components/ui/Button";
+import api from "../../api/axiosConfig";
 import GoogleButton from "../../components/ui/GoogleButton";
 import Divider from "../../components/ui/Divider";
 import "./AuthForm.css";
@@ -20,7 +21,7 @@ export default function Login() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -35,14 +36,30 @@ export default function Login() {
     }
 
     setLoading(true);
+try {
+  const response = await api.post("/api/auth/login",{
+    phoneNumber: formData.phoneNumber,
+    password: formData.password,
+  });
+  
 
-    // TODO: Replace with real API call once backend endpoint is ready
-    // e.g. await api.post("/auth/login", formData);
-    setTimeout(() => {
-      localStorage.setItem("token", "fake-login-token");
-      setLoading(false);
-      navigate("/home");
-    }, 800);
+  if (response.data.error) {
+    setError(response.data.error);
+    setLoading(false);
+  } else {
+    localStorage.setItem("token", response.data.token);
+    //takes you home if sign in successful
+    navigate("/home");   
+} 
+} catch (err) {
+  console.error("Login failed", err);
+
+  const errorMessage = err.response?.data?.error || "Internal server error. Please try again.";
+  setError(errorMessage);
+  setLoading(false);
+} finally {
+  setLoading(false);
+}
   };
 
   return (

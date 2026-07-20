@@ -1,18 +1,12 @@
-import React from 'react';
- {/* import Settings from './pages/Settings'; */} 
-import './App.css';
-import Carousel from './components/layout/Carousel';
+import { BrowserRouter } from "react-router-dom";
+import AppRoutes from "./routes/AppRoutes";
+import "./App.css";
 
 function App() {
   return (
-    <div className="App">
-     
-   {/*  <Settings /> */ } 
-   <div style={{  color: 'white', padding: '20px', height: '30vh' }}>
-   <Carousel />
-    </div>
-      
-    </div>
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
   );
 }
 
