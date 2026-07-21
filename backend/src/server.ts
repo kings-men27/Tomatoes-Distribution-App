@@ -23,29 +23,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 const PORT = process.env.PORT || 3000;
 
-
-
-
-
-async function startServer() {
-  try {
-    // 1. Ensure the DB is created first
-    await ensureDatabaseExists();
-
-    // 2. Now initialize your AppDataSource (which connects to 'tomatoes')
-    await AppDataSource.initialize();
-    console.log("AppDataSource initialized successfully.");
-    
-    // ... start your express server here
-  } catch (error) {
-    console.error("Error during startup:", error);
-  }
-}
-
-startServer();
-
-
-
 // --- Security & Utility Middlewares ---
 app.use(helmet());
 app.use(cors());
@@ -74,18 +51,20 @@ app.get('/health', (req: Request, res: Response) => {
 });
 
 
-// --- Server & Database Initialization ---
-AppDataSource.initialize()
-  .then(() => {
-    
-    console.log(' Database connection established.');
-   // startBookingStatusScheduler();
-    
-    app.listen(3000, () => {
-    console.log('Server running on http://localhost:3000');
-});
-  })
-  .catch((error) => {
-    console.error(' Server startup failed:', error);
-    process.exit(1);
-  });
+//Server & Database Initialization
+async function startServer() {
+  try {
+    if (!AppDataSource.isInitialized) {
+      await AppDataSource.initialize();
+      console.log('Database connection established.');
+    }
+
+    app.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error('Error during startup:', error);
+  }
+}
+
+startServer();

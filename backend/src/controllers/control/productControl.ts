@@ -23,10 +23,11 @@ export const getProducts = async (req: Request, res: Response) => {
     const products = await productRepo.find({
       order: orderQuery,
       relations: {
-        reviews: true,
-  
-    },
-   });
+        reviews: {
+          author: true, // Nests the author relation so review.author.userName is returned
+        },
+      },
+    });
 
     res.status(200).json(products);
   } catch (error) {
@@ -36,19 +37,23 @@ export const getProducts = async (req: Request, res: Response) => {
 
 export const addReview = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { productId, } = req.body as { productId: string };
+    const { productId } = req.body as { productId: string };
     const { rating, comment } = req.body;
     
-    // Extracted from JWT middleware
-    const userName = (req as any).user?.name || (req as any).user?.username || 'Anonymous';
+    // Extract the user's ID from the JWT middleware payload
+    const userId = (req as any).user?.id || (req as any).user?.userId;
+
+    if (!userId) {
+      res.status(401).json({ error: 'Unauthorized: User ID missing from token' });
+      return;
+    }
 
     const productRepo = AppDataSource.getRepository(Product);
     const reviewRepo = AppDataSource.getRepository(Review);
 
-  
-  const product = await productRepo.findOne({
-  where: { productId },
-  });
+    const product = await productRepo.findOne({
+      where: { productId },
+    });
 
     if (!product) {
       res.status(404).json({ error: 'Product not found' });
@@ -57,8 +62,6 @@ export const addReview = async (req: Request, res: Response): Promise<void> => {
 
     // Protected Product logic
     if (product.isProtected) {
-      // e.g. logic: restrict based on user role or verification.
-      // Assuming req.user contains role or isVerified flag.
       const isVerified = (req as any).user?.isVerified;
       if (!isVerified) {
         res.status(403).json({ error: 'Only verified users can review protected products' });
@@ -68,7 +71,7 @@ export const addReview = async (req: Request, res: Response): Promise<void> => {
 
     const review = reviewRepo.create({
       product,
-      userName,
+      authorId: userId, // Correctly mapped to the User foreign key column
       rating,
       comment
     });

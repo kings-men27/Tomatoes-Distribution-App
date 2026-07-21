@@ -41,27 +41,32 @@ export class DashboardService {
       leaderboardData,
       seasonalityData
     ] = await Promise.all([
-      
       logisticsRepo.createQueryBuilder('logistics')
         .select([
-          `COALESCE(SUM(logistics.quantitySentKg * (${BASELINE_LOSS_RATE} - (logistics.spoilageRatePercent / 100.0))), 0) AS total_food_saved_kg`,
+          `COALESCE(
+            SUM(
+              COALESCE(logistics.quantitySentKg, 0) * 
+              (${BASELINE_LOSS_RATE} - (COALESCE(logistics.spoilageRatePercent, 0) / 100.0))
+            ), 0
+          ) AS total_food_saved_kg`,
           `COALESCE(AVG(logistics.spoilageRatePercent), 0) AS avg_platform_spoilage_rate`
         ])
         .getRawOne(),
 
       logisticsRepo.createQueryBuilder('logistics')
-        .select('COALESCE(SUM(logistics.deliveredRevenueNgn), 0)', 'total_revenue_delivered_ngn')
-        .where('logistics.spoilageStatusLabel = :status', { status: 'Not Spoiled' })
+        .select('COALESCE(SUM(logistics.quantitySentCrates * logistics.pricePerCrateNgn), 0)', 'total_revenue_delivered_ngn')
+        .where('COALESCE(logistics.spoilageRatePercent, 0) < 50')
         .getRawOne(),
 
       logisticsRepo.createQueryBuilder('logistics')
         .select([
           'logistics.originState AS "originState"',
-          'logistics.destinationState AS "destinationState"',
+          'COALESCE(CAST(logistics.destinationCity AS text), logistics.destinationState, \'Unknown\') AS "destinationState"',
           'COALESCE(AVG(logistics.checkpointDelayHours), 0) AS avg_delay_hours',
           'COALESCE(AVG(logistics.averageTemperatureC), 0) AS avg_temp_c'
         ])
         .groupBy('logistics.originState')
+        .addGroupBy('logistics.destinationCity')
         .addGroupBy('logistics.destinationState')
         .orderBy('avg_delay_hours', 'DESC')
         .getRawMany(),
@@ -81,13 +86,13 @@ export class DashboardService {
         totalRevenueDeliveredNgn: Number(safeNumber(revenueData?.total_revenue_delivered_ngn).toFixed(2)),
         platformSpoilageRatePercent: Number(safeNumber(kpiData?.avg_platform_spoilage_rate).toFixed(2)),
       },
-      corridorLeaderboard: leaderboardData.map((item) => ({
-        originState: item.originState ?? 'Unknown', 
-        destinationState: item.destinationState ?? 'Unknown',
+      corridorLeaderboard: (leaderboardData || []).map((item) => ({
+        originState: item.originState ?? item.origin_state ?? 'Unknown', 
+        destinationState: item.destinationState ?? item.destination_state ?? 'Unknown',
         avgDelayHours: Number(safeNumber(item.avg_delay_hours).toFixed(2)),
         avgTempC: Number(safeNumber(item.avg_temp_c).toFixed(2)),
       })),
-      seasonalityTrends: seasonalityData.map((item) => ({
+      seasonalityTrends: (seasonalityData || []).map((item) => ({
         season: item.season ?? 'Unknown',
         avgPricePerCrate: Number(safeNumber(item.avg_price_per_crate).toFixed(2)),
       }))

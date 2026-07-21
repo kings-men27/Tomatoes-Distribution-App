@@ -6,9 +6,16 @@ import {
   OneToOne,
   JoinColumn,
   CreateDateColumn,
-  UpdateDateColumn
+  UpdateDateColumn,
+  ValueTransformer
 } from "typeorm";
 import { User, Order } from "../entity"; 
+
+// Converts PostgreSQL string decimals ("25.00") directly to TS numbers (25.00)
+export const numericTransformer: ValueTransformer = {
+  to: (value: number | null) => value,
+  from: (value: string | null) => (value === null ? 0 : parseFloat(value)),
+};
 
 export enum Destination {
   LAGOS = 'Lagos',
@@ -67,23 +74,77 @@ export class Logistics {
   @Column({ type: 'enum', enum: Destination })
   destinationCity!: Destination;
 
+  @Column({ type: 'varchar', nullable: true })
+  destinationState?: string;
+
+  @Column({ 
+    type: 'decimal', 
+    precision: 5, 
+    scale: 2, 
+    default: 0, 
+    transformer: numericTransformer 
+  })
+  spoilageRatePercent!: number;
+
+  @Column({ type: 'varchar', nullable: true, default: 'Not Spoiled' })
+  spoilageStatusLabel!: string;
+
+  @Column({ 
+    type: 'decimal', 
+    precision: 10, 
+    scale: 2, 
+    default: 0, 
+    transformer: numericTransformer 
+  })
+  quantitySentKg!: number;
+
+  @Column({ type: 'int' })
+  quantitySentCrates!: number;
+
   @Column({ type: 'enum', enum: PackagingType })
   packagingType!: PackagingType;
 
   @Column({ type: 'enum', enum: Season })
   season!: Season;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({ 
+    type: 'decimal', 
+    precision: 10, 
+    scale: 2, 
+    transformer: numericTransformer 
+  })
   routeDistanceKm!: number;
 
   @Column({ type: 'enum', enum: TransportMode })
   transportMode!: TransportMode;
 
-  @Column({ type: 'int' })
-  quantitySentCrates!: number;
-
-  @Column({ type: 'decimal', precision: 5, scale: 2 })
+  @Column({ 
+    type: 'decimal', 
+    precision: 5, 
+    scale: 2, 
+    transformer: numericTransformer 
+  })
   hoursSinceHarvestAtDispatch!: number;
+
+  // Added for Dashboard Bottleneck Leaderboard
+  @Column({ 
+    type: 'decimal', 
+    precision: 5, 
+    scale: 2, 
+    default: 0, 
+    transformer: numericTransformer 
+  })
+  checkpointDelayHours!: number;
+
+  // Added for Dashboard Corridor Temperature Monitoring
+  @Column({ 
+    type: 'decimal', 
+    precision: 5, 
+    scale: 2, 
+    default: 25, 
+    transformer: numericTransformer 
+  })
+  averageTemperatureC!: number;
 
   @Column({ type: 'boolean', default: false })
   coldStorageAvailable!: boolean;
@@ -103,26 +164,36 @@ export class Logistics {
   @Column({ type: 'varchar', nullable: true })
   driverPhoneNumber?: string;
 
- 
-  // FOREIGN KEY COLUMNS
- 
+  @Column({ 
+    type: 'decimal', 
+    precision: 10, 
+    scale: 2, 
+    default: 0, 
+    transformer: numericTransformer 
+  })
+  pricePerCrateNgn!: number;
 
-  @Column({ type: 'uuid' })
-  userId!: string;
+  @Column({ 
+    type: 'decimal', 
+    precision: 12, 
+    scale: 2, 
+    default: 0, 
+    transformer: numericTransformer 
+  })
+  deliveredRevenueNgn!: number;
+
+  // FOREIGN KEY COLUMNS
+  @Column({ type: 'uuid', nullable: true })
+  userId?: string;
 
   @Column({ type: 'uuid', nullable: true })
   orderId?: string;
 
- 
   // RELATIONSHIPS
- 
-
-  // Tracks which user (operator/driver/farmer) registered this delivery log
   @ManyToOne(() => User, (user) => user.id, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'userId' })
-  user!: User;
+  user?: User;
 
-  // link back to the Order entity
   @OneToOne(() => Order, (order) => order.logistics, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'orderId' })
   order?: Order;

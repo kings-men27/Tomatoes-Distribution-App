@@ -11,7 +11,8 @@ import { isAuthenticated,
 import { 
   authCtrl,
   oAuthCtrl,
-  dashCtrl
+  dashCtrl,
+  apiCtrl
   
 } from '../controllers/control'; 
 
@@ -35,7 +36,8 @@ apiRouter.post('/auth/reset-password', authCtrl.resetPassword);
 apiRouter.post('/auth/update-security-question', isAuthenticated, authCtrl.addSecurityQuestion);
 
 
-apiRouter.get("/metrics", isAuthenticated, dashCtrl.getDashboardMetrics);// ADMIN LOGIC
+apiRouter.get("/metrics", dashCtrl.getDashboardMetrics);
+apiRouter.post("/predict-spoilage", apiCtrl.handleFastApi);
 
 
 
