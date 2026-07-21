@@ -1,28 +1,31 @@
 .welcome-page {
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
   background-color: #f4f8f4;
+  overflow-x: hidden;
 }
 
+/* HERO */
 .welcome-hero {
-  background-color: #1b4332;
-  padding: 48px 24px 40px;
+  background-color: #14301f;
+  padding: 24px;
+  border-radius: 0 0 40px 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.welcome-hero-top {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  text-align: center;
-  border-radius: 0 0 32px 32px;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  position: relative;
+  z-index: 2;
 }
 
 .welcome-logo {
   display: flex;
   align-items: center;
   gap: 8px;
-  background-color: #ffffff;
-  padding: 10px 20px;
-  border-radius: 999px;
-  margin-bottom: 16px;
 }
 
 .welcome-logo-img {
@@ -32,79 +35,356 @@
 }
 
 .welcome-logo-text {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 800;
-  color: #1b4332;
+  color: #ffffff;
 }
 
-.welcome-tagline {
+.welcome-login-btn {
+  background: none;
+  border: 1px solid #ffffff;
+  color: #ffffff;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.welcome-hero-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: relative;
+}
+
+.welcome-hero-text {
+  position: relative;
+  z-index: 2;
+}
+
+.welcome-headline {
+  font-size: 30px;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.2;
+  margin-bottom: 12px;
+}
+
+.highlight-green {
+  color: #74c69d;
+}
+
+.highlight-orange {
+  color: #e8823a;
+}
+
+.welcome-subtext {
   font-size: 14px;
   color: #dbe8dc;
-  font-weight: 500;
+  margin-bottom: 20px;
+  line-height: 1.5;
+  max-width: 420px;
 }
 
-.welcome-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 32px 24px;
-}
-
-.welcome-features {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 32px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.welcome-features li {
-  display: flex;
+.get-started-btn {
+  display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+  background-color: #2d6a4f;
+  color: #ffffff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 999px;
   font-size: 14px;
-  color: #1a1a1a;
-  background-color: #ffffff;
-  padding: 14px 16px;
-  border-radius: 10px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  font-weight: 700;
+  cursor: pointer;
 }
 
-.welcome-feature-icon {
-  flex-shrink: 0;
-  width: 22px;
-  height: 22px;
-  color: #1b4332;
+.get-started-btn svg {
+  width: 16px;
+  height: 16px;
 }
 
-.welcome-feature-icon svg {
+.welcome-hero-image-wrap {
+  position: relative;
+  width: 100%;
+  height: 160px;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.welcome-hero-image {
   width: 100%;
   height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 0.9;
 }
 
-.welcome-role-section {
+.welcome-hero-image-wrap::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, #14301f 0%, rgba(20, 48, 31, 0) 40%);
+  z-index: 1;
+}
+
+/* BODY / WHY SECTION */
+.welcome-body {
+  padding: 32px 20px;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 24px;
   text-align: center;
 }
 
-.welcome-select-role {
+.section-heading h2 {
+  font-size: 18px;
+  font-weight: 800;
+  color: #1a1a1a;
+  white-space: nowrap;
+}
+
+.heading-divider {
+  flex: 1;
+  max-width: 40px;
+  height: 1px;
+  background-color: #a8c5a8;
+}
+
+.welcome-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 40px;
+}
+
+.welcome-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 14px 10px;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.welcome-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 10px;
+}
+
+.welcome-card-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.icon-green {
+  background-color: #dbe8dc;
+  color: #1b4332;
+}
+
+.icon-orange {
+  background-color: #fbe4d0;
+  color: #e8823a;
+}
+
+.welcome-card-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 6px;
+}
+
+.welcome-card-text {
+  font-size: 10px;
+  color: #4b5563;
+  line-height: 1.4;
+  margin-bottom: 10px;
+}
+
+.card-underline {
+  display: block;
+  width: 24px;
+  height: 3px;
+  border-radius: 2px;
+  margin: 0 auto;
+}
+
+.underline-green {
+  background-color: #1b4332;
+}
+
+.underline-orange {
+  background-color: #e8823a;
+}
+
+/* ROLE CARDS */
+.role-heading {
+  margin-top: 8px;
+}
+
+.welcome-role-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.role-card {
+  border: none;
+  border-radius: 16px;
+  padding: 28px 20px;
+  text-align: center;
+  cursor: pointer;
+  color: #ffffff;
+  position: relative;
+}
+
+.role-card-farmer {
+  background-color: #1b4332;
+}
+
+.role-card-buyer {
+  background-color: #e8823a;
+}
+
+.role-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+}
+
+.role-card-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.role-card-label {
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.role-card-name {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 6px;
+  letter-spacing: 0.03em;
+}
+
+.role-card-tagline {
+  font-size: 12px;
+  opacity: 0.9;
+  margin-bottom: 16px;
+}
+
+.role-card-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.role-card-arrow svg {
+  width: 16px;
+  height: 16px;
+  color: #ffffff;
+}
+
+/* TRUST FOOTER */
+.trust-footer {
+  border-top: 1px solid #d1d9d2;
+  padding-top: 20px;
+  text-align: center;
+}
+
+.trust-heading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   font-size: 13px;
   font-weight: 700;
   color: #1a1a1a;
   margin-bottom: 16px;
-  letter-spacing: 0.03em;
 }
 
-.welcome-role-buttons {
+.trust-heading svg {
+  width: 16px;
+  height: 16px;
+  color: #1b4332;
+}
+
+.trust-badges {
   display: flex;
-  gap: 16px;
-  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
 }
 
-.welcome-role-btn {
-  flex: 1;
-  max-width: 160px;
-  padding: 14px 0;
-  font-size: 15px;
+.trust-badges span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #4b5563;
+}
+
+.trust-badges svg {
+  width: 14px;
+  height: 14px;
+  color: #1b4332;
+}
+
+@media (min-width: 768px) {
+  .welcome-hero-content {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .welcome-hero-text {
+    flex: 1;
+    max-width: 50%;
+  }
+
+  .welcome-hero-image-wrap {
+    flex: 1;
+    max-width: 45%;
+    height: 260px;
+  }
+
+  .welcome-hero-image-wrap::before {
+    background: linear-gradient(to right, #14301f 0%, rgba(20, 48, 31, 0) 25%);
+  }
+
+  .welcome-role-cards {
+    flex-direction: row;
+  }
+
+  .role-card {
+    flex: 1;
+  }
+
+  .trust-badges {
+    flex-direction: row;
+    justify-content: center;
+    gap: 24px;
+  }
 }

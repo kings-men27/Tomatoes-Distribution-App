@@ -1,8 +1,8 @@
-import "./GoogleButton.css";
+ï»¿import "./GoogleButton.css";
 
 export default function GoogleButton({ onClick }) {
   const handleClick = () => {
-    console.log("Google sign-in clicked — not yet connected");
+    console.log("Google sign-in clicked - not yet connected");
     if (onClick) onClick();
   };
 

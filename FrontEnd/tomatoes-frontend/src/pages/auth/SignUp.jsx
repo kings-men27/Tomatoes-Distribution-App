@@ -1,18 +1,21 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import Input from "../../components/ui/Input";
+import Select from "../../components/ui/Select";
 import Button from "../../components/ui/Button";
 import GoogleButton from "../../components/ui/GoogleButton";
 import Divider from "../../components/ui/Divider";
 import "./AuthForm.css";
 
-
 export default function SignUp() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [searchParams] = useSearchParams();
-  const role = searchParams.get("role"); // "this is for the farmer and the buyer"
+  const roleFromUrl = searchParams.get("role");
 
   const [formData, setFormData] = useState({
+    role: roleFromUrl === "farmer" || roleFromUrl === "buyer" ? roleFromUrl : "",
     name: "",
     businessName: "",
     farmLocation: "",
@@ -34,6 +37,11 @@ export default function SignUp() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setError("");
+
+    if (!formData.role) {
+      setError("Please select whether you are a Farmer or Buyer.");
+      return;
+    }
 
     if (
       !formData.name ||
@@ -58,9 +66,10 @@ export default function SignUp() {
     setLoading(true);
 
     // TODO: Replace with real API call once backend endpoint is ready
-    // e.g. await api.post("/auth/signup", formData);
+    // e.g. const response = await api.post("/auth/signup", formData);
+    // login(response.data.token, formData.role);
     setTimeout(() => {
-      localStorage.setItem("token", "fake-signup-token");
+      login("fake-signup-token", formData.role);
       setLoading(false);
       navigate("/home");
     }, 800);
@@ -71,6 +80,15 @@ export default function SignUp() {
       <h1 className="auth-title">SIGN UP</h1>
 
       <form onSubmit={handleSubmit} className="auth-form">
+        <Select
+          label="I AM A:"
+          name="role"
+          value={formData.role}
+          onChange={handleChange}
+          options={["farmer", "buyer"]}
+          placeholder="Select role"
+        />
+
         <Input
           label="NAME:"
           name="name"

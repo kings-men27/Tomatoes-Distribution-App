@@ -73,3 +73,14 @@
   color: #1a1a1a;
   margin-bottom: 12px;
 }
+
+.dashboard-status-text {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.dashboard-error-text {
+  color: #dc2626;
+}

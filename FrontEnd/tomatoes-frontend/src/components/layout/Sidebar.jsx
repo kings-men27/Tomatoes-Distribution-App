@@ -1,12 +1,14 @@
 import { useNavigate, NavLink } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import logo from "../../assets/images/ZeroSpoil_icon.svg";
 import "./Sidebar.css";
 
 export default function Sidebar({ isOpen, onClose }) {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    logout();
     onClose();
     navigate("/login");
   };
@@ -35,6 +37,21 @@ export default function Sidebar({ isOpen, onClose }) {
           <li>
             <NavLink to="/details" onClick={onClose} className="sidebar-link">
               Details
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/notifications" onClick={onClose} className="sidebar-link">
+              Notifications
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/prediction" onClick={onClose} className="sidebar-link">
+              Prediction
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/wallet" onClick={onClose} className="sidebar-link">
+              Wallet
             </NavLink>
           </li>
           <li>

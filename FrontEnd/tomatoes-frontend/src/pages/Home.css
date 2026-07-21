@@ -1,0 +1,164 @@
+.home-page {
+  padding: 20px;
+}
+
+.home-image {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+.list-toggle-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #1b4332;
+  color: #ffffff;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.toggle-circle {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  transition: transform 0.2s ease;
+}
+
+.toggle-circle.toggle-on {
+  transform: translateX(4px);
+  background-color: #a8c5a8;
+}
+
+.home-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  margin-bottom: 24px;
+}
+
+.done-btn {
+  align-self: flex-end;
+  margin-top: 8px;
+}
+
+.home-stats-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.shipments-section {
+  margin-bottom: 20px;
+}
+
+.shipments-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 14px;
+}
+
+.view-all-link {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1b4332;
+  cursor: pointer;
+}
+
+.shipments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.shipment-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 14px 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  border-left: 3px solid #1b4332;
+  transition: box-shadow 0.15s ease;
+}
+
+.shipment-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.shipment-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.shipment-route-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #f4f8f4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1b4332;
+  flex-shrink: 0;
+}
+
+.shipment-route-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.shipment-route {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 2px;
+}
+
+.shipment-crates {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.status-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.status-in-transit {
+  background-color: #fbe4d0;
+  color: #e8823a;
+}
+
+.status-delivered {
+  background-color: #dbe8dc;
+  color: #1b4332;
+}
+
+.status-pending {
+  background-color: #f0f0f0;
+  color: #6b7280;
+}
