@@ -35,8 +35,7 @@ apiRouter.post('/auth/reset-password', authCtrl.resetPassword);
 apiRouter.post('/auth/update-security-question', isAuthenticated, authCtrl.addSecurityQuestion);
 
 
-apiRouter.get("/metrics", isAuthenticated, dashCtrl.getDashboardMetrics););
-// ADMIN LOGIC
+apiRouter.get("/metrics", isAuthenticated, dashCtrl.getDashboardMetrics);// ADMIN LOGIC
 
 
 
