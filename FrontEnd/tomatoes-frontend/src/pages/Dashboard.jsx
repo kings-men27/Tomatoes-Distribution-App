@@ -32,7 +32,7 @@ export default function Dashboard() {
         setError(null);
 
         // API call to backend dashboard analytics route
-        const response = await api.get("/dashboard/summary");
+        const response = await api.get("/metrics");
 
         if (response.data?.data) {
           setDashboardData(response.data.data);
