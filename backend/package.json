@@ -4,13 +4,14 @@
   "description": "Tomatoes Backend",
   "main": "index.js",
   "scripts": {
+    "build": "echo 'No build needed for tsx'",
+    "start": "node --import tsx/esm src/server.ts",
     "dev": "tsx watch src/server.ts",
-    "build": "tsx --tsconfig tsconfig.json src/server.ts",
-    "start": "node dist/server.js",
     "swagger": "tsx swagger.ts",
     "migration:generate": "tsx node_modules/typeorm/cli.js migration:generate src/db/migrations/myFirst -d src/db/datasource.ts",
     "migration:run": "tsx node_modules/typeorm/cli.js migration:run -d src/db/datasource.ts",
     "migration:revert": "tsx node_modules/typeorm/cli.js migration:revert -d src/db/datasource.ts",
+    "seed": "tsx src/db/seed.ts",
     "test": "node --loader ts-node/esm/esm src/test.ts"
   },
   "keywords": [],
@@ -19,7 +20,7 @@
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
-      "version": "^11.10.0",
+      "version": "11.10.0",
       "onFail": "download"
     }
   },
