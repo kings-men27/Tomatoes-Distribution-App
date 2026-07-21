@@ -1,15 +1,28 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import api from "../../api/axiosConfig"; 
 import Input from "../../components/ui/Input";
 import Button from "../../components/ui/Button";
 import "./AuthForm.css";
 
 export default function ForgotPassword() {
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  
+  const [step, setStep] = useState(1);
+
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [securityQuestion, setSecurityQuestion] = useState("");
+  const [securityAnswer, setSecurityAnswer] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [error, setError] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
+  const [loading, setLoading] = useState(false);
+
+ 
+  const handleFetchQuestion = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -18,21 +31,79 @@ export default function ForgotPassword() {
       return;
     }
 
-    // TODO: Replace with real API call once backend endpoint is ready
-    // e.g. await api.post("/auth/forgot-password", { phoneNumber });
-    setSubmitted(true);
+    setLoading(true);
+
+    try {
+      const response = await api.post("/getRecoveryQuestion", { phoneNumber });
+
+      if (response.data.success) {
+        setSecurityQuestion(response.data.securityQuestion);
+        setStep(2);
+      }
+    } catch (err) {
+      const message =
+        err.response?.data?.message || "No security question configured or phone number not found.";
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // STEP 2: Submit Answer and Reset Password
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    if (!securityAnswer || !newPassword || !confirmPassword) {
+      setError("Please fill in all fields.");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await api.post("/resetPassword", {
+        phoneNumber,
+        securityAnswer,
+        newPassword,
+      });
+
+      if (response.data.success) {
+        setSuccessMsg("Password reset successful! Redirecting to login...");
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
+      }
+    } catch (err) {
+      const message =
+        err.response?.data?.message || "Invalid answer or recovery credentials.";
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="auth-card">
       <h1 className="auth-title">FORGOT PASSWORD</h1>
 
-      {submitted ? (
-        <p className="auth-switch">
-          If an account exists for that number, reset instructions have been sent.
+      {successMsg ? (
+        <p className="auth-success" style={{ textAlign: "center", color: "#4CAF50" }}>
+          {successMsg}
         </p>
-      ) : (
-        <form onSubmit={handleSubmit} className="auth-form">
+      ) : step === 1 ? (
+        /* STEP 1: Enter Phone Number */
+        <form onSubmit={handleFetchQuestion} className="auth-form">
           <Input
             label="PHONE NUMBER:"
             name="phoneNumber"
@@ -43,8 +114,47 @@ export default function ForgotPassword() {
 
           {error && <p className="auth-error">{error}</p>}
 
-          <Button type="submit" className="auth-submit-btn">
-            SEND RESET LINK
+          <Button type="submit" disabled={loading} className="auth-submit-btn">
+            {loading ? "SEARCHING..." : "GET SECURITY QUESTION"}
+          </Button>
+        </form>
+      ) : (
+        /* STEP 2: Security Question & Password Form */
+        <form onSubmit={handleResetPassword} className="auth-form">
+          <div className="security-question-box" style={{ marginBottom: "1rem" }}>
+            <p style={{ fontWeight: "bold", fontSize: "0.9rem" }}>
+              QUESTION: {securityQuestion}
+            </p>
+          </div>
+
+          <Input
+            label="YOUR ANSWER:"
+            name="securityAnswer"
+            type="text"
+            value={securityAnswer}
+            onChange={(e) => setSecurityAnswer(e.target.value)}
+          />
+
+          <Input
+            label="NEW PASSWORD:"
+            name="newPassword"
+            type="password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+          />
+
+          <Input
+            label="CONFIRM NEW PASSWORD:"
+            name="confirmPassword"
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+
+          {error && <p className="auth-error">{error}</p>}
+
+          <Button type="submit" disabled={loading} className="auth-submit-btn">
+            {loading ? "RESETTING..." : "RESET PASSWORD"}
           </Button>
         </form>
       )}

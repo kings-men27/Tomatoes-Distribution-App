@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import api from "../../api/axiosConfig";  
 import Input from "../../components/ui/Input";
 import Select from "../../components/ui/Select";
 import Button from "../../components/ui/Button";
@@ -16,12 +17,14 @@ export default function SignUp() {
 
   const [formData, setFormData] = useState({
     role: roleFromUrl === "farmer" || roleFromUrl === "buyer" ? roleFromUrl : "",
-    name: "",
+    userName: "",
     businessName: "",
     farmLocation: "",
     phoneNumber: "",
     password: "",
     confirmPassword: "",
+    securityQuestion: "",
+    securityAnswer: "",
     accountNumber: "",
     accountName: "",
     bankName: "",
@@ -34,7 +37,7 @@ export default function SignUp() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -44,12 +47,14 @@ export default function SignUp() {
     }
 
     if (
-      !formData.name ||
+      !formData.userName ||
       !formData.phoneNumber ||
       !formData.password ||
-      !formData.confirmPassword
+      !formData.confirmPassword ||
+      !formData.securityQuestion ||
+      !formData.securityAnswer
     ) {
-      setError("Please fill in all required fields.");
+      setError("Please fill in all required fields, including security details.");
       return;
     }
 
@@ -65,14 +70,36 @@ export default function SignUp() {
 
     setLoading(true);
 
-    // TODO: Replace with real API call once backend endpoint is ready
-    // e.g. const response = await api.post("/auth/signup", formData);
-    // login(response.data.token, formData.role);
-    setTimeout(() => {
-      login("fake-signup-token", formData.role);
+    try {
+      // POST request to backend signUp endpoint
+      const response = await api.post("/auth/register", {
+        role: formData.role,
+        userName: formData.userName,
+        phoneNumber: formData.phoneNumber,
+        password: formData.password,
+        securityQuestion: formData.securityQuestion,
+        securityAnswer: formData.securityAnswer,
+        businessName: formData.businessName,
+        farmLocation: formData.farmLocation,
+        accountNumber: formData.accountNumber,
+        accountName: formData.accountName,
+        bankName: formData.bankName,
+      });
+
+      if (response.data.success) {
+        const { token, user } = response.data;
+
+        // Save session state via AuthContext
+        login(token, user);
+        navigate("/home");
+      }
+    } catch (err) {
+      const serverMessage =
+        err.response?.data?.message || "Unable to complete sign up. Please try again.";
+      setError(serverMessage);
+    } finally {
       setLoading(false);
-      navigate("/home");
-    }, 800);
+    }
   };
 
   return (
@@ -85,14 +112,14 @@ export default function SignUp() {
           name="role"
           value={formData.role}
           onChange={handleChange}
-          options={["farmer", "buyer"]}
+          options={["FARMER", "BUYER"]}
           placeholder="Select role"
         />
 
         <Input
           label="NAME:"
-          name="name"
-          value={formData.name}
+          name="userName"
+          value={formData.userName}
           onChange={handleChange}
         />
         <Input
@@ -126,6 +153,22 @@ export default function SignUp() {
           name="confirmPassword"
           type="password"
           value={formData.confirmPassword}
+          onChange={handleChange}
+        />
+
+        <h2 className="auth-subtitle">SECURITY RECOVERY</h2>
+
+        <Input
+          label="SECURITY QUESTION:"
+          name="securityQuestion"
+          placeholder="e.g. What is your pet's name?"
+          value={formData.securityQuestion}
+          onChange={handleChange}
+        />
+        <Input
+          label="SECURITY ANSWER:"
+          name="securityAnswer"
+          value={formData.securityAnswer}
           onChange={handleChange}
         />
 
