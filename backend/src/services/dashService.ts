@@ -1,6 +1,14 @@
 import { AppDataSource } from '../db/datasource';
 import { Logistics } from '../controllers/entity';
 
+const BASELINE_LOSS_RATE = 0.3253;
+
+function safeNumber(value: unknown, fallback = 0): number {
+  if (value === null || value === undefined) return fallback;
+  const n = Number(value);
+  return Number.isNaN(n) ? fallback : n;
+}
+
 export interface CorridorLeaderboardItem {
   originState: string;
   destinationState: string;
@@ -27,7 +35,6 @@ export class DashboardService {
   static async getDashboardSummary(): Promise<DashboardMetricsPayload> {
     const logisticsRepo = AppDataSource.getRepository(Logistics);
 
-    // Run all complex aggregations concurrently for speed
     const [
       kpiData,
       revenueData,
@@ -35,59 +42,54 @@ export class DashboardService {
       seasonalityData
     ] = await Promise.all([
       
-      // KPI 1 & 3: Total Food Saved & Platform Spoilage Rate
       logisticsRepo.createQueryBuilder('logistics')
         .select([
-          'SUM(logistics.quantitySentKg * (0.3253 - (logistics.spoilageRatePercent / 100.0))) AS total_food_saved_kg',
-          'AVG(logistics.spoilageRatePercent) AS avg_platform_spoilage_rate'
+          `COALESCE(SUM(logistics.quantitySentKg * (${BASELINE_LOSS_RATE} - (logistics.spoilageRatePercent / 100.0))), 0) AS total_food_saved_kg`,
+          `COALESCE(AVG(logistics.spoilageRatePercent), 0) AS avg_platform_spoilage_rate`
         ])
         .getRawOne(),
 
-      // KPI 2: Total Revenue Delivered
       logisticsRepo.createQueryBuilder('logistics')
-        .select('SUM(logistics.deliveredRevenueNgn)', 'total_revenue_delivered_ngn')
+        .select('COALESCE(SUM(logistics.deliveredRevenueNgn), 0)', 'total_revenue_delivered_ngn')
         .where('logistics.spoilageStatusLabel = :status', { status: 'Not Spoiled' })
         .getRawOne(),
 
-      // Risk Map Corridor Leaderboard
       logisticsRepo.createQueryBuilder('logistics')
         .select([
           'logistics.originState AS "originState"',
           'logistics.destinationState AS "destinationState"',
-          'AVG(logistics.checkpointDelayHours) AS avg_delay_hours',
-          'AVG(logistics.averageTemperatureC) AS avg_temp_c'
+          'COALESCE(AVG(logistics.checkpointDelayHours), 0) AS avg_delay_hours',
+          'COALESCE(AVG(logistics.averageTemperatureC), 0) AS avg_temp_c'
         ])
         .groupBy('logistics.originState')
         .addGroupBy('logistics.destinationState')
         .orderBy('avg_delay_hours', 'DESC')
         .getRawMany(),
 
-      // Market Seasonality Trends
       logisticsRepo.createQueryBuilder('logistics')
         .select([
           'logistics.season AS season',
-          'AVG(logistics.pricePerCrateNgn) AS avg_price_per_crate'
+          'COALESCE(AVG(logistics.pricePerCrateNgn), 0) AS avg_price_per_crate'
         ])
         .groupBy('logistics.season')
         .getRawMany()
     ]);
 
-    // Construct and return the unified payload, ensuring PostgreSQL strings map to TypeScript Numbers
     return {
       kpis: {
-        totalFoodSavedKg: Number(kpiData?.total_food_saved_kg) || 0,
-        totalRevenueDeliveredNgn: Number(revenueData?.total_revenue_delivered_ngn) || 0,
-        platformSpoilageRatePercent: Number(kpiData?.avg_platform_spoilage_rate) || 0,
+        totalFoodSavedKg: Number(safeNumber(kpiData?.total_food_saved_kg).toFixed(2)),
+        totalRevenueDeliveredNgn: Number(safeNumber(revenueData?.total_revenue_delivered_ngn).toFixed(2)),
+        platformSpoilageRatePercent: Number(safeNumber(kpiData?.avg_platform_spoilage_rate).toFixed(2)),
       },
       corridorLeaderboard: leaderboardData.map((item) => ({
-        originState: item.originState, 
-        destinationState: item.destinationState,
-        avgDelayHours: Number(item.avg_delay_hours) || 0,
-        avgTempC: Number(item.avg_temp_c) || 0,
+        originState: item.originState ?? 'Unknown', 
+        destinationState: item.destinationState ?? 'Unknown',
+        avgDelayHours: Number(safeNumber(item.avg_delay_hours).toFixed(2)),
+        avgTempC: Number(safeNumber(item.avg_temp_c).toFixed(2)),
       })),
       seasonalityTrends: seasonalityData.map((item) => ({
-        season: item.season,
-        avgPricePerCrate: Number(item.avg_price_per_crate) || 0,
+        season: item.season ?? 'Unknown',
+        avgPricePerCrate: Number(safeNumber(item.avg_price_per_crate).toFixed(2)),
       }))
     };
   }

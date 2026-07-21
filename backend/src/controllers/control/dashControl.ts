@@ -2,13 +2,13 @@ import { Request, Response, NextFunction } from 'express';
 import { DashboardService } from '../../services/dashService';
 
 export const getDashboardMetrics = async (
-  req: Request, 
-  res: Response, 
+  req: Request,
+  res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
     const payload = await DashboardService.getDashboardSummary();
-    
+
     res.status(200).json({
       success: true,
       data: payload

@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { application, Router } from 'express';
 //import adminRouter from './adminRouter';
 
 // Auth Middleware
@@ -10,7 +10,8 @@ import { isAuthenticated,
 // Controllers
 import { 
   authCtrl,
-  oAuthCtrl
+  oAuthCtrl,
+  dashCtrl
   
 } from '../controllers/control'; 
 
@@ -34,7 +35,7 @@ apiRouter.post('/auth/reset-password', authCtrl.resetPassword);
 apiRouter.post('/auth/update-security-question', isAuthenticated, authCtrl.addSecurityQuestion);
 
 
-
+apiRouter.get("/metrics", isAuthenticated, dashCtrl.getDashboardMetrics););
 // ADMIN LOGIC
 
 
