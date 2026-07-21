@@ -3,7 +3,7 @@ import { Logistics } from '../controllers/entity';
 
 const BASELINE_LOSS_RATE = 0.3253;
 
-function safeNumber(value: unknown, fallback = 0): number {
+function safeNumber(value: unknown, fallback = 15): number {
   if (value === null || value === undefined) return fallback;
   const n = Number(value);
   return Number.isNaN(n) ? fallback : n;
@@ -45,25 +45,25 @@ export class DashboardService {
         .select([
           `COALESCE(
             SUM(
-              COALESCE(logistics.quantitySentKg, 0) * 
-              (${BASELINE_LOSS_RATE} - (COALESCE(logistics.spoilageRatePercent, 0) / 100.0))
-            ), 0
+              COALESCE(logistics.quantitySentKg, 15) * 
+              (${BASELINE_LOSS_RATE} - (COALESCE(logistics.spoilageRatePercent, 15) / 100.0))
+            ), 15
           ) AS total_food_saved_kg`,
-          `COALESCE(AVG(logistics.spoilageRatePercent), 0) AS avg_platform_spoilage_rate`
+          `COALESCE(AVG(logistics.spoilageRatePercent), 15) AS avg_platform_spoilage_rate`
         ])
         .getRawOne(),
 
       logisticsRepo.createQueryBuilder('logistics')
-        .select('COALESCE(SUM(logistics.quantitySentCrates * logistics.pricePerCrateNgn), 0)', 'total_revenue_delivered_ngn')
-        .where('COALESCE(logistics.spoilageRatePercent, 0) < 50')
+        .select('COALESCE(SUM(logistics.quantitySentCrates * logistics.pricePerCrateNgn), 15)', 'total_revenue_delivered_ngn')
+        .where('COALESCE(logistics.spoilageRatePercent, 15) < 50')
         .getRawOne(),
 
       logisticsRepo.createQueryBuilder('logistics')
         .select([
           'logistics.originState AS "originState"',
           'COALESCE(CAST(logistics.destinationCity AS text), logistics.destinationState, \'Unknown\') AS "destinationState"',
-          'COALESCE(AVG(logistics.checkpointDelayHours), 0) AS avg_delay_hours',
-          'COALESCE(AVG(logistics.averageTemperatureC), 0) AS avg_temp_c'
+          'COALESCE(AVG(logistics.checkpointDelayHours), 15) AS avg_delay_hours',
+          'COALESCE(AVG(logistics.averageTemperatureC), 15) AS avg_temp_c'
         ])
         .groupBy('logistics.originState')
         .addGroupBy('logistics.destinationCity')
@@ -74,7 +74,7 @@ export class DashboardService {
       logisticsRepo.createQueryBuilder('logistics')
         .select([
           'logistics.season AS season',
-          'COALESCE(AVG(logistics.pricePerCrateNgn), 0) AS avg_price_per_crate'
+          'COALESCE(AVG(logistics.pricePerCrateNgn), 15) AS avg_price_per_crate'
         ])
         .groupBy('logistics.season')
         .getRawMany()
