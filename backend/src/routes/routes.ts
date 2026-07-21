@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { application, Router } from 'express';
 //import adminRouter from './adminRouter';
 
 // Auth Middleware
@@ -10,7 +10,8 @@ import { isAuthenticated,
 // Controllers
 import { 
   authCtrl,
-  oAuthCtrl
+  oAuthCtrl,
+  dashCtrl
   
 } from '../controllers/control'; 
 
@@ -31,11 +32,10 @@ apiRouter.post("/auth/google/complete", oAuthCtrl.completeOAuthOnboarding);
 apiRouter.post('/auth/forgot-password/get-question', authCtrl.getRecoveryQuestion);
 apiRouter.post('/auth/forgot-password/verify', verifySecurityAnswer);
 apiRouter.post('/auth/reset-password', authCtrl.resetPassword);
+apiRouter.post('/auth/update-security-question', isAuthenticated, authCtrl.addSecurityQuestion);
 
 
-
-
-// ADMIN LOGIC
+apiRouter.get("/metrics", isAuthenticated, dashCtrl.getDashboardMetrics);// ADMIN LOGIC
 
 
 
