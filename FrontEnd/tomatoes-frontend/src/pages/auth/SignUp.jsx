@@ -112,7 +112,7 @@ export default function SignUp() {
           name="role"
           value={formData.role}
           onChange={handleChange}
-          options={["farmer", "buyer"]}
+          options={["FARMER", "BUYER"]}
           placeholder="Select role"
         />
 
