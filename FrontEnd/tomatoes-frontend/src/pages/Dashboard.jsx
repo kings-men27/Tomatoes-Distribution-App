@@ -1,43 +1,23 @@
 import { useState, useEffect } from "react";
-import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import {
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
+import api from "../api/axiosConfig"; 
 import StatCard from "../components/ui/StatCard";
 import "./Dashboard.css";
 
-const MOCK_RESPONSE = {
-  success: true,
-  data: {
-    kpis: {
-      totalFoodSavedKg: -1629.58,
-      totalRevenueDeliveredNgn: 0,
-      platformSpoilageRatePercent: 23.33,
-    },
-    corridorLeaderboard: [
-      { originState: "Kaduna", destinationState: "Lagos", avgDelayHours: 0, avgTempC: 25 },
-      { originState: "Gombe", destinationState: "Onitsha", avgDelayHours: 0, avgTempC: 25 },
-      { originState: "Plateau", destinationState: "Ibadan", avgDelayHours: 0, avgTempC: 25 },
-      { originState: "Kaduna", destinationState: "Port Harcourt", avgDelayHours: 0, avgTempC: 25 },
-      { originState: "Kaduna", destinationState: "Ibadan", avgDelayHours: 0, avgTempC: 25 },
-      { originState: "Gombe", destinationState: "Port Harcourt", avgDelayHours: 0, avgTempC: 25 },
-      { originState: "Plateau", destinationState: "Port Harcourt", avgDelayHours: 0, avgTempC: 25 },
-      { originState: "Plateau", destinationState: "Lagos", avgDelayHours: 0, avgTempC: 25 },
-      { originState: "Plateau", destinationState: "Onitsha", avgDelayHours: 0, avgTempC: 25 },
-      { originState: "Kano", destinationState: "Ibadan", avgDelayHours: 0, avgTempC: 25 },
-      { originState: "Kano", destinationState: "Lagos", avgDelayHours: 0, avgTempC: 25 },
-      { originState: "Kano", destinationState: "Port Harcourt", avgDelayHours: 0, avgTempC: 25 },
-      { originState: "Gombe", destinationState: "Ibadan", avgDelayHours: 0, avgTempC: 25 },
-      { originState: "Kaduna", destinationState: "Onitsha", avgDelayHours: 0, avgTempC: 25 },
-      { originState: "Kano", destinationState: "Onitsha", avgDelayHours: 0, avgTempC: 25 },
-      { originState: "Gombe", destinationState: "Lagos", avgDelayHours: 0, avgTempC: 25 },
-    ],
-    seasonalityTrends: [
-      { season: "Rainy Season", avgPricePerCrate: 0 },
-      { season: "Dry Season", avgPricePerCrate: 0 },
-    ],
-  },
-};
-
 function formatNaira(value) {
-  return `\u20A6${Number(value).toLocaleString()}`;
+  const amount = Number(value) || 0;
+  return `\u20A6${amount.toLocaleString()}`;
 }
 
 export default function Dashboard() {
@@ -51,13 +31,20 @@ export default function Dashboard() {
         setLoading(true);
         setError(null);
 
-        // TODO: swap this block for the real API call once endpoint is available
-        // const response = await api.get("/dashboard/summary");
-        // setDashboardData(response.data.data);
-        await new Promise((resolve) => setTimeout(resolve, 400));
-        setDashboardData(MOCK_RESPONSE.data);
+        // API call to backend dashboard analytics route
+        const response = await api.get("/dashboard/summary");
+
+        if (response.data?.data) {
+          setDashboardData(response.data.data);
+        } else if (response.data) {
+          // Handle cases where response returns payload directly
+          setDashboardData(response.data);
+        }
       } catch (err) {
-        setError("Failed to load dashboard data. Please try again.");
+        const message =
+          err.response?.data?.message ||
+          "Failed to load dashboard data. Please check your connection.";
+        setError(message);
       } finally {
         setLoading(false);
       }
@@ -90,12 +77,16 @@ export default function Dashboard() {
     );
   }
 
-  const { kpis, corridorLeaderboard, seasonalityTrends } = dashboardData;
+  const {
+    kpis = {},
+    corridorLeaderboard = [],
+    seasonalityTrends = [],
+  } = dashboardData;
 
   const routeChartData = corridorLeaderboard.map((item) => ({
     route: `${item.originState} to ${item.destinationState}`,
-    avgDelayHours: item.avgDelayHours,
-    avgTempC: item.avgTempC,
+    avgDelayHours: item.avgDelayHours || 0,
+    avgTempC: item.avgTempC || 0,
   }));
 
   return (
@@ -105,9 +96,18 @@ export default function Dashboard() {
       </div>
 
       <div className="dashboard-kpi-row">
-        <StatCard label="Delivered Revenue" value={formatNaira(kpis.totalRevenueDeliveredNgn)} />
-        <StatCard label="Total Food Saved (KG)" value={kpis.totalFoodSavedKg.toLocaleString()} />
-        <StatCard label="Platform Spoilage %" value={`${kpis.platformSpoilageRatePercent}%`} />
+        <StatCard
+          label="Delivered Revenue"
+          value={formatNaira(kpis.totalRevenueDeliveredNgn)}
+        />
+        <StatCard
+          label="Total Food Saved (KG)"
+          value={(kpis.totalFoodSavedKg || 0).toLocaleString()}
+        />
+        <StatCard
+          label="Platform Spoilage %"
+          value={`${kpis.platformSpoilageRatePercent || 0}%`}
+        />
       </div>
 
       <div className="dashboard-chart-row">
@@ -116,11 +116,21 @@ export default function Dashboard() {
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={routeChartData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="route" tick={{ fontSize: 9 }} angle={-30} textAnchor="end" height={70} />
+              <XAxis
+                dataKey="route"
+                tick={{ fontSize: 9 }}
+                angle={-30}
+                textAnchor="end"
+                height={70}
+              />
               <YAxis tick={{ fontSize: 11 }} />
               <Tooltip />
               <Legend wrapperStyle={{ fontSize: 11 }} />
-              <Bar dataKey="avgDelayHours" name="Avg Delay (hrs)" fill="#1b4332" />
+              <Bar
+                dataKey="avgDelayHours"
+                name="Avg Delay (hrs)"
+                fill="#1b4332"
+              />
               <Bar dataKey="avgTempC" name="Avg Temp (C)" fill="#95c99a" />
             </BarChart>
           </ResponsiveContainer>
@@ -134,7 +144,13 @@ export default function Dashboard() {
               <XAxis dataKey="season" tick={{ fontSize: 11 }} />
               <YAxis tick={{ fontSize: 11 }} />
               <Tooltip />
-              <Line type="monotone" dataKey="avgPricePerCrate" name="Avg Price/Crate" stroke="#1b4332" strokeWidth={2} />
+              <Line
+                type="monotone"
+                dataKey="avgPricePerCrate"
+                name="Avg Price/Crate"
+                stroke="#1b4332"
+                strokeWidth={2}
+              />
             </LineChart>
           </ResponsiveContainer>
         </div>

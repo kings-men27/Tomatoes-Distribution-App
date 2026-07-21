@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import api from "../../api/axiosConfig"; 
 import Input from "../../components/ui/Input";
 import Button from "../../components/ui/Button";
 import GoogleButton from "../../components/ui/GoogleButton";
@@ -13,7 +14,6 @@ export default function Login() {
   const [formData, setFormData] = useState({
     phoneNumber: "",
     password: "",
-    confirmPassword: "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -22,7 +22,7 @@ export default function Login() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -31,21 +31,29 @@ export default function Login() {
       return;
     }
 
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match.");
-      return;
-    }
-
     setLoading(true);
 
-    // TODO: Replace with real API call once backend endpoint is ready
-    // e.g. const response = await api.post("/auth/login", formData);
-    // login(response.data.token, response.data.role);
-    setTimeout(() => {
-      login("fake-login-token");
+    try {
+      
+      const response = await api.post("/auth/login", {
+        phoneNumber: formData.phoneNumber,
+        password: formData.password,
+      });
+
+      if (response.data.success) {
+        const { token, user } = response.data;
+
+        // Persist token & user state in AuthContext
+        login(token, user);
+        navigate("/home");
+      }
+    } catch (err) {
+      const serverMessage =
+        err.response?.data?.message || "Unable to connect to server. Please try again.";
+      setError(serverMessage);
+    } finally {
       setLoading(false);
-      navigate("/home");
-    }, 800);
+    }
   };
 
   return (
@@ -65,13 +73,6 @@ export default function Login() {
           name="password"
           type="password"
           value={formData.password}
-          onChange={handleChange}
-        />
-        <Input
-          label="CONFIRM PASSWORD:"
-          name="confirmPassword"
-          type="password"
-          value={formData.confirmPassword}
           onChange={handleChange}
         />
 
