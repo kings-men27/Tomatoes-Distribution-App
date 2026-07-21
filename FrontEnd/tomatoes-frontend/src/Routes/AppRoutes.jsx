@@ -12,6 +12,8 @@ import Notifications from "../pages/Notifications";
 import Details from "../pages/Details";
 import Settings from "../pages/Settings";
 import Dashboard from "../pages/Dashboard";
+import Prediction from "../pages/Prediction";
+import Wallet from "../pages/Wallet";
 
 export default function AppRoutes() {
   return (
@@ -35,6 +37,8 @@ export default function AppRoutes() {
         <Route path="/details" element={<Details />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/prediction" element={<Prediction />} />
+        <Route path="/wallet" element={<Wallet />} />
       </Route>
 
       <Route path="/" element={<Welcome />} />
@@ -42,3 +46,5 @@ export default function AppRoutes() {
     </Routes>
   );
 }
+
+

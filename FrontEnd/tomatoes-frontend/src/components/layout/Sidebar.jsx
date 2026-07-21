@@ -38,6 +38,21 @@ export default function Sidebar({ isOpen, onClose }) {
             </NavLink>
           </li>
           <li>
+            <NavLink to="/notifications" onClick={onClose} className="sidebar-link">
+              Notifications
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/prediction" onClick={onClose} className="sidebar-link">
+              Prediction
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/wallet" onClick={onClose} className="sidebar-link">
+              Wallet
+            </NavLink>
+          </li>
+          <li>
             <NavLink to="/settings" onClick={onClose} className="sidebar-link">
               Settings
             </NavLink>
