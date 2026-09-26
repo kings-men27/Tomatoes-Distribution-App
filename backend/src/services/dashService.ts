@@ -63,8 +63,8 @@ export class DashboardService {
       // 3. Corridor Leaderboard Data for Graphs/Maps
       logisticsRepo.createQueryBuilder('logistics')
         .select([
-          'COALESCE(logistics.originState, \'Unknown Origin\') AS "originState"',
-          'COALESCE(CAST(logistics.destinationCity AS text), logistics.destinationState, \'Unknown Destination\') AS "destinationState"',
+          'logistics.originState AS "originState"',
+          'COALESCE(CAST(logistics.destinationCity AS text), logistics.destinationState) AS "destinationState"',
           'COALESCE(AVG(logistics.checkpointDelayHours), 15) AS avg_delay_hours',
           'COALESCE(AVG(logistics.averageTemperatureC), 15) AS avg_temp_c'
         ])
@@ -75,9 +75,10 @@ export class DashboardService {
         .getRawMany(),
 
       // 4. Seasonality Trends Data for Graphs
+      // Removed COALESCE on the season enum to prevent Postgres 22P02 errors
       logisticsRepo.createQueryBuilder('logistics')
         .select([
-          'COALESCE(logistics.season, \'General Season\') AS season',
+          'logistics.season AS season',
           'COALESCE(AVG(logistics.pricePerCrateNgn), 15) AS avg_price_per_crate'
         ])
         .groupBy('logistics.season')
@@ -97,6 +98,7 @@ export class DashboardService {
         avgTempC: Number(safeNumber(item.avg_temp_c).toFixed(2)),
       })),
       seasonalityTrends: (seasonalityData || []).map((item) => ({
+        // TypeScript handles the enum string fallback here instead of the database
         season: item.season ?? 'General Season',
         avgPricePerCrate: Number(safeNumber(item.avg_price_per_crate).toFixed(2)),
       }))

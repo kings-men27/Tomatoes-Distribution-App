@@ -83,10 +83,17 @@ export default function Dashboard() {
     seasonalityTrends = [],
   } = dashboardData;
 
+  // 1. Sanitize Corridor Data for BarChart
   const routeChartData = corridorLeaderboard.map((item) => ({
-    route: `${item.originState} to ${item.destinationState}`,
-    avgDelayHours: item.avgDelayHours || 0,
-    avgTempC: item.avgTempC || 0,
+    route: `${item.originState || "Unknown"} to ${item.destinationState || "Unknown"}`,
+    avgDelayHours: Number(item.avgDelayHours) || 0,
+    avgTempC: Number(item.avgTempC) || 0,
+  }));
+
+  // 2. Sanitize Seasonality Data for LineChart
+  const seasonalityChartData = seasonalityTrends.map((item) => ({
+    season: item.season || "General Season",
+    avgPricePerCrate: Number(item.avgPricePerCrate) || 0,
   }));
 
   return (
@@ -102,11 +109,11 @@ export default function Dashboard() {
         />
         <StatCard
           label="Total Food Saved (KG)"
-          value={(kpis.totalFoodSavedKg || 0).toLocaleString()}
+          value={(Number(kpis.totalFoodSavedKg) || 0).toLocaleString()}
         />
         <StatCard
           label="Platform Spoilage %"
-          value={`${kpis.platformSpoilageRatePercent || 0}%`}
+          value={`${Number(kpis.platformSpoilageRatePercent) || 0}%`}
         />
       </div>
 
@@ -138,8 +145,9 @@ export default function Dashboard() {
 
         <div className="chart-placeholder">
           <h2>Seasonality Price Trend</h2>
-          <ResponsiveContainer width="100%" height={220}>
-            <LineChart data={seasonalityTrends}>
+          <ResponsiveContainer width="100%" height={260}>
+            {/* 3. Pass sanitized data here */}
+            <LineChart data={seasonalityChartData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="season" tick={{ fontSize: 11 }} />
               <YAxis tick={{ fontSize: 11 }} />
